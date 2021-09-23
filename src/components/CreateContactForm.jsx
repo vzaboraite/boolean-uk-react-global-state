@@ -1,29 +1,29 @@
-import { useState } from "react";
+import useStore from "../store";
 
-function CreateContactForm(props) {
-  const { contacts, setContacts } = props;
+function CreateContactForm() {
+  const contacts = useStore((state) => state.contacts);
+  const setContacts = useStore((state) => state.setContacts);
 
   // [TODO] Write form handlers here and POST requests here...
 
   // Method One: Simple but tedious
 
   // Contact State
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [blockContact, setBlockContact] = useState(false);
+  const { firstName, lastName, blockContact } = useStore(
+    (state) => state.contactInputs
+  );
+  const setContactInputs = useStore((state) => state.setContactInputs);
 
   // Address State
-  const [street, setStreet] = useState("");
-  const [city, setCity] = useState("");
-  const [postCode, setPostCode] = useState("");
-
+  const { street, city, postCode } = useStore((state) => state.addressInputs);
+  const setAddressInputs = useStore((state) => state.setAddressInputs);
   console.log("CreateContactForm State: ", {
     contact: {
       firstName,
       lastName,
-      blockContact
+      blockContact,
     },
-    address: { street, city, postCode }
+    address: { street, city, postCode },
   });
 
   // Form Handlers
@@ -34,15 +34,15 @@ function CreateContactForm(props) {
     const addressToCreate = {
       street,
       city,
-      postCode
+      postCode,
     };
 
     const fetchOptions = {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify(addressToCreate)
+      body: JSON.stringify(addressToCreate),
     };
 
     fetch("http://localhost:3030/addresses", fetchOptions)
@@ -54,7 +54,7 @@ function CreateContactForm(props) {
           firstName,
           lastName,
           blockContact,
-          addressId: newAddress.id
+          addressId: newAddress.id,
         };
 
         console.log("contact to create: ", contactToCreate);
@@ -64,9 +64,9 @@ function CreateContactForm(props) {
         const fetchOptions = {
           method: "POST",
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
           },
-          body: JSON.stringify(contactToCreate)
+          body: JSON.stringify(contactToCreate),
         };
 
         fetch("http://localhost:3030/contacts", fetchOptions)
@@ -77,17 +77,22 @@ function CreateContactForm(props) {
       });
   };
 
-  const handleFirstName = (event) => setFirstName(event.target.value);
+  const handleFirstName = (event) =>
+    setContactInputs({ firstName: event.target.value });
 
-  const handleLastName = (event) => setLastName(event.target.value);
+  const handleLastName = (event) =>
+    setContactInputs({ lastName: event.target.value });
 
-  const handleBlockCheckbox = (event) => setBlockContact(event.target.checked);
+  const handleBlockCheckbox = (event) =>
+    setContactInputs({ blockContact: event.target.checked });
 
-  const handleStreet = (event) => setStreet(event.target.value);
+  const handleStreet = (event) =>
+    setAddressInputs({ street: event.target.value });
 
-  const handleCity = (event) => setCity(event.target.value);
+  const handleCity = (event) => setAddressInputs({ city: event.target.value });
 
-  const handlePostCode = (event) => setPostCode(event.target.value);
+  const handlePostCode = (event) =>
+    setAddressInputs({ postCode: event.target.value });
 
   return (
     <form

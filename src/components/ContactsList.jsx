@@ -1,5 +1,12 @@
-function ContactsList(props) {
-  const { contacts, hideForm, setHideForm, setContactToEdit } = props;
+import useStore from "../store";
+
+function ContactsList() {
+  const contacts = useStore((state) => state.contacts);
+
+  const hideForm = useStore((state) => state.hideForm);
+  const setHideForm = useStore((state) => state.setHideForm);
+
+  const setContactToEdit = useStore((state) => state.setContactToEdit);
 
   return (
     <aside className="contacts-section light-shadow">

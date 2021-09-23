@@ -1,31 +1,35 @@
 import { useEffect, useState } from "react";
+import useStore from "../store";
 
-function EditContactForm(props) {
-  const { contacts, setContacts, contactToEdit } = props;
+function EditContactForm() {
+  const contactToEdit = useStore((state) => state.contactToEdit);
 
   console.log("Inside EditContactForm: ", contactToEdit);
+
+  const contacts = useStore((state) => state.contacts);
+  const setContacts = useStore((state) => state.setContacts);
 
   // [TODO] Write form handlers here and POST requests here...
 
   // Method One: Simple but tedious
 
   // Contact State
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [blockContact, setBlockContact] = useState(false);
+  const { firstName, lastName, blockContact } = useStore(
+    (state) => state.contactInputs
+  );
+  const setContactInputs = useStore((state) => state.setContactInputs);
 
   // Address State
-  const [street, setStreet] = useState("");
-  const [city, setCity] = useState("");
-  const [postCode, setPostCode] = useState("");
+  const { street, city, postCode } = useStore((state) => state.addressInputs);
+  const setAddressInputs = useStore((state) => state.setAddressInputs);
 
   console.log("EditContactForm State: ", {
     contact: {
       firstName,
       lastName,
-      blockContact
+      blockContact,
     },
-    address: { street, city, postCode }
+    address: { street, city, postCode },
   });
 
   // useEffect keeps track of the changes in the component
@@ -34,12 +38,13 @@ function EditContactForm(props) {
       const { firstName, lastName, blockContact, address } = contactToEdit;
 
       const { street, city, postCode } = address;
-      setFirstName(firstName);
-      setLastName(lastName);
-      setBlockContact(blockContact);
-      setStreet(street);
-      setCity(city);
-      setPostCode(postCode);
+      setContactInputs({ firstName: firstName });
+      setContactInputs({ lastName: lastName });
+      setContactInputs({ blockContact: blockContact });
+
+      setAddressInputs({ street: street });
+      setAddressInputs({ city: city });
+      setAddressInputs({ postCode: postCode });
     }
   }, [contactToEdit]);
 
@@ -53,15 +58,15 @@ function EditContactForm(props) {
     const addressToUpdate = {
       street,
       city,
-      postCode
+      postCode,
     };
 
     const addressesFetchOptions = {
       method: "PUT",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify(addressToUpdate)
+      body: JSON.stringify(addressToUpdate),
     };
 
     fetch(
@@ -76,15 +81,15 @@ function EditContactForm(props) {
           firstName,
           lastName,
           blockContact,
-          addressId: contactToEdit.addressId
+          addressId: contactToEdit.addressId,
         };
 
         const contactsFetchOptions = {
           method: "PUT",
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
           },
-          body: JSON.stringify(contactToUpdate)
+          body: JSON.stringify(contactToUpdate),
         };
 
         fetch(
@@ -98,17 +103,22 @@ function EditContactForm(props) {
       });
   };
 
-  const handleFirstName = (event) => setFirstName(event.target.value);
+  const handleFirstName = (event) =>
+    setContactInputs({ firstName: event.target.value });
 
-  const handleLastName = (event) => setLastName(event.target.value);
+  const handleLastName = (event) =>
+    setContactInputs({ lastName: event.target.value });
 
-  const handleBlockCheckbox = (event) => setBlockContact(event.target.checked);
+  const handleBlockCheckbox = (event) =>
+    setContactInputs({ blockContact: event.target.checked });
 
-  const handleStreet = (event) => setStreet(event.target.value);
+  const handleStreet = (event) =>
+    setAddressInputs({ street: event.target.value });
 
-  const handleCity = (event) => setCity(event.target.value);
+  const handleCity = (event) => setAddressInputs({ city: event.target.value });
 
-  const handlePostCode = (event) => setPostCode(event.target.value);
+  const handlePostCode = (event) =>
+    setAddressInputs({ postCode: event.target.value });
 
   return (
     <form

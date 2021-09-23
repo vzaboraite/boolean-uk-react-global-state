@@ -1,45 +1,31 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import ContactsList from "./components/ContactsList";
 import CreateContactForm from "./components/CreateContactForm";
 import EditContactForm from "./components/EditContactForm";
+import useStore from "./store";
 import "./styles.css";
 
 export default function App() {
-  const [contacts, setContacts] = useState([]);
-  const [hideForm, setHideForm] = useState(true);
+  const hideForm = useStore((state) => state.hideForm);
 
-  // This is our intermediary, a place to hold the data during the transaction
-  const [contactToEdit, setContactToEdit] = useState(null);
+  const getContacts = useStore((state) => state.getContacts);
 
-  console.log("App State: ", { contacts, hideForm, contactToEdit });
+  console.log("App State: ", { hideForm, getContacts });
 
   // [TODO] Write a useEffect to fetch contacts here...
 
   useEffect(() => {
-    fetch("http://localhost:3030/contacts")
-      .then((res) => res.json())
-      .then((contactsData) => setContacts(contactsData));
+    getContacts();
   }, []);
 
   return (
     <>
       {/* ContactsList is the component with the data we need; so we extract it using setState */}
-      <ContactsList
-        contacts={contacts}
-        hideForm={hideForm}
-        setHideForm={setHideForm}
-        setContactToEdit={setContactToEdit}
-      />
+      <ContactsList />
       <main>
-        {!hideForm && (
-          <CreateContactForm contacts={contacts} setContacts={setContacts} />
-        )}
+        {!hideForm && <CreateContactForm />}
         {/* EditContactForm is the component we need to send the data to */}
-        <EditContactForm
-          contacts={contacts}
-          setContacts={setContacts}
-          contactToEdit={contactToEdit}
-        />
+        <EditContactForm />
       </main>
     </>
   );
